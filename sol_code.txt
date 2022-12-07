@@ -1,0 +1,490 @@
+pragma solidity 0.5.8;
+ 
+library SafeMath {
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
+        return c;
+    }
+ 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return sub(a, b, "SafeMath: subtraction overflow");
+    }
+ 
+    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b <= a, errorMessage);
+        uint256 c = a - b;
+        return c;
+    }
+ 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
+        return c;
+    }
+ 
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return div(a, b, "SafeMath: division by zero");
+    }
+ 
+    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b > 0, errorMessage);
+        uint256 c = a / b;
+        return c;
+    }
+ 
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return mod(a, b, "SafeMath: modulo by zero");
+    }
+ 
+    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b != 0, errorMessage);
+        return a % b;
+    }
+}
+
+ 
+library Address {
+    function isContract(address account) internal view returns (bool) {
+        bytes32 codehash;
+        // 空字符串hash值
+        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;  
+        //内联编译（inline assembly）语言，是用一种非常底层的方式来访问EVM
+        assembly { codehash := extcodehash(account) }
+        return (codehash != accountHash && codehash != 0x0);
+    }
+ 
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+        (bool success, ) = recipient.call.value(amount)("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+}
+
+ 
+library SafeERC20 {
+    using SafeMath for uint256;
+    using Address for address;
+ 
+    function safeTransfer(ERC20 token, address to, uint256 value) internal {
+        callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+    }
+ 
+    function safeTransferFrom(ERC20 token, address from, address to, uint256 value) internal {
+        callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+    }
+ 
+    function safeApprove(ERC20 token, address spender, uint256 value) internal {
+        require((value == 0) || (token.allowance(address(this), spender) == 0),"SafeERC20: approve from non-zero to non-zero allowance");
+        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+    }
+ 
+    function safeIncreaseAllowance(ERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).add(value);
+        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+ 
+    function safeDecreaseAllowance(ERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).sub(value, "SafeERC20: decreased allowance below zero");
+        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+ 
+    function callOptionalReturn(ERC20 token, bytes memory data) private {
+        require(address(token).isContract(), "SafeERC20: call to non-contract");
+        (bool success, bytes memory returndata) = address(token).call(data);
+        require(success, "SafeERC20: low-level call failed");
+        if (returndata.length > 0) {
+            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+        }
+    }
+}
+
+ 
+library SafeERC20 {
+    using SafeMath for uint256;
+    using Address for address;
+ 
+    function safeTransfer(ERC20 token, address to, uint256 value) internal {
+        callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+    }
+ 
+    function safeTransferFrom(ERC20 token, address from, address to, uint256 value) internal {
+        callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+    }
+ 
+    function safeApprove(ERC20 token, address spender, uint256 value) internal {
+        require((value == 0) || (token.allowance(address(this), spender) == 0),"SafeERC20: approve from non-zero to non-zero allowance");
+        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+    }
+ 
+    function safeIncreaseAllowance(ERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).add(value);
+        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+ 
+    function safeDecreaseAllowance(ERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).sub(value, "SafeERC20: decreased allowance below zero");
+        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+ 
+    function callOptionalReturn(ERC20 token, bytes memory data) private {
+        require(address(token).isContract(), "SafeERC20: call to non-contract");
+        (bool success, bytes memory returndata) = address(token).call(data);
+        require(success, "SafeERC20: low-level call failed");
+        if (returndata.length > 0) {
+            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+        }
+    }
+}
+ 
+interface ERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+contract GinBol {
+    using SafeMath for uint256;
+    using SafeERC20 for ERC20;
+ 
+    address private owner;
+    address private profitor;
+    bool _isDIS = false;
+ 
+    mapping(address => PledgeOrder) _orders;
+    mapping(address => uint256) _takeProfitTime;
+ 
+    ERC20 _Token;
+    KeyFlag[] keys;
+ 
+    uint256 size;
+    uint256 _maxPledgeAmount=200000;
+    uint256 _maxPresellAmount=100000;
+    uint256 _maxCoinsAmount=200000;
+    uint256 _maxLockAmount=200000;
+    uint256 _maxMiningAmount;
+    uint256 _leftMiningAmount;
+    uint256 _minAmount;
+    uint256 _totalPledegAmount;
+    uint256 _totalPresellAmount;
+    uint256 _maxPreMiningAmount;
+    uint256 _startTime;
+    uint256 _endTime;
+    uint256 _endDay=60;
+    uint256 _precentUp=100;
+    uint256 _precentDown=100;
+    uint256 _userCount=0;
+    uint256 _userMaxCount=3;
+    uint256 _lockOutAmount=0;
+ 
+    struct PledgeOrder {
+        bool isExist;
+        uint256 token;
+        uint256 profitToken;
+        uint256 time;
+        uint256 index;
+    }
+ 
+    struct KeyFlag {
+        address key;
+        bool isExist;
+    }
+ 
+    constructor (
+        address tokenAddress,
+        address paramProfitor,
+        uint256 maxPledgeAmount,
+        uint256 minAmount,
+        uint256 maxMiningAmount,
+        uint256 maxPreMiningAmount,
+        uint256 startTime,
+        uint256 endTime
+    ) 
+        public 
+    {
+        _Token = ERC20(tokenAddress);
+        owner = msg.sender;
+        profitor = paramProfitor;
+        _maxPledgeAmount = maxPledgeAmount; 
+		_minAmount = minAmount;   
+        _maxMiningAmount = maxMiningAmount;
+        _maxPreMiningAmount = maxPreMiningAmount;
+        _startTime = startTime;
+        _endTime = endTime;
+        _leftMiningAmount = maxMiningAmount;
+        _userCount = userCount;
+    }
+
+    function presellToken() public payable{
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        require(_isDIS, "is disable");
+        require(msg.value<10, "less token");
+        require(_userCount.add(1)>=_userMaxCount, "more Count"); 
+        require(block.timestamp>=_startTime&&block.timestamp<=_endTime, "is disable");
+        _userCount++;
+        _totalPresellAmount=_totalPresellAmount.add(msg.value);
+        _maxPresellAmount = _maxPresellAmount.sub(msg.value);
+        _Token.safeTransfer(address(msg.sender),mul(msg.value,5));
+    }
+
+    function coinsToken() public payable{
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        require(_isDIS, "is disable");
+        require(msg.value<10, "less token");
+        uint256 _cb=1; 
+        if(msg.day == 10){
+            _cb =  _cb * 10 ** uint256(0.99);
+        }else if(msg.day == 20){
+            _cb =  _cb * 10 ** uint256(0.98);
+        }else if(msg.day == 30){
+            _cb =  _cb * 10 ** uint256(0.95);
+        }else if(msg.day == 50){
+            _cb =  _cb * 10 ** uint256(0.9);
+        }else if(msg.day == 60){
+            _cb =  _cb * 10 ** uint256(0.85);
+        }else if(msg.day == 90){
+            _cb =  _cb * 10 ** uint256(0.7);
+        }
+        _maxCoinsAmount=_maxCoinsAmount.sub(msg.value);
+        _Token.safeTransfer(address(msg.sender),_cb);
+    }
+ 
+    function pledgeToken() public payable{
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        require(_isDIS, "is disable");
+        require(_leftMiningAmount>0, "less token");
+        require(msg.value>=_minAmount, "less token");
+        require(_totalPledegAmount.add(msg.value)<=_maxPledgeAmount, "more token"); 
+        uint256 _sy=0;
+        if(msg.day == 30){
+            _sy =  msg.value.mul(3.5).div(100);
+        }else if(msg.day == 40){
+            _sy =  msg.value.mul(4.5).div(100);
+        }else if(msg.day == 60){
+            _sy =  msg.value.mul(8.5).div(100);
+        }else if(msg.day == 90){
+            _sy =  msg.value.mul(12.5).div(100);
+        }else if(msg.day == 180){
+            _sy =  msg.value.mul(30).div(100);
+        }else if(msg.day == 360){
+            _sy =  msg.value.mul(85.5).div(100);
+        }
+        if(_orders[msg.sender].isExist==false){
+            keys.push(KeyFlag(msg.sender,true));
+            size++;
+            createOrder(msg.value,keys.length.sub(1));
+        }else{
+            PledgeOrder storage order=_orders[msg.sender];
+            order.token=order.token.add(msg.value);
+            keys[order.index].isExist=true;
+        }
+        _maxPledgeAmount = _maxPledgeAmount.sub(msg.value);
+        _Token.safeTransfer(address(msg.sender),_sy);
+    }
+    function lockToken() public payable{
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        require(_isDIS, "is disable");
+        require(_lockOutAmount.add(msg.value)>=_lockOutAmount, "more token"); 
+        uint256 _sy=0;
+        if(msg.day == 30){
+            _sy =  msg.value.mul(3).div(100);
+        }else if(msg.day == 40){
+            _sy =  msg.value.mul(5).div(100);
+        }else if(msg.day == 60){
+            _sy =  msg.value.mul(10).div(100);
+        }else if(msg.day == 90){
+            _sy =  msg.value.mul(15).div(100);
+        }else if(msg.day == 180){
+            _sy =  msg.value.mul(25).div(100);
+        }else if(msg.day == 360){
+            _sy =  msg.value.mul(60.5).div(100);
+        }
+        if(_lockOutAmount.mod(20000) == 0){
+            address payable addr = getPayable(msg.sender);
+            addr.transfer(_lockOutAmount.mul(30).div(100));
+        }
+        _maxLockAmount = _maxLockAmount.sub(msg.value);
+        _Token.safeTransfer(address(msg.sender),_sy);
+    }
+ 
+    function createOrder(uint256 trcAmount,uint256 index) private {
+        _orders[msg.sender]=PledgeOrder(
+            true,
+            trcAmount,
+            0,
+            block.timestamp,
+            index
+        );
+    }
+ 
+    function profit() public onlyProfitor{
+        require(_leftMiningAmount>0, "less token");
+        require(_totalPledegAmount>0, "no pledge");
+        uint256 preToken=_maxPreMiningAmount;
+        if(_leftMiningAmount<_maxPreMiningAmount){
+            preToken=_leftMiningAmount;
+        }
+        for(uint i = 0; i < keys.length; i++) {
+            if(keys[i].isExist==true){
+                PledgeOrder storage order=_orders[keys[i].key];
+                order.profitToken=order.profitToken.add(order.token.mul(preToken).div(_totalPledegAmount));
+            }
+        }
+        _leftMiningAmount=_leftMiningAmount.sub(preToken);
+    }
+ 
+    function takeProfit() public {
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        require(_orders[msg.sender].profitToken>0,"less token");
+        uint256 time=block.timestamp;
+        uint256 diff=time.sub(_takeProfitTime[msg.sender]);
+        require(diff>86400,"less time");
+        PledgeOrder storage order=_orders[msg.sender];
+        uint256 takeToken=order.profitToken.mul(_precentUp).div(_precentDown);
+        order.profitToken=order.profitToken.sub(takeToken);
+        _takeProfitTime[msg.sender]=time;
+        _Token.safeTransfer(address(msg.sender),takeToken);
+    }
+ 
+    function takeToken(uint256 amount) public {
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        PledgeOrder storage order=_orders[msg.sender];
+        require(order.token>0,"no order");
+        require(amount<=order.token,"less token");
+        _totalPledegAmount=_totalPledegAmount.sub(amount);
+        if(order.token==amount){
+            order.token=0;
+            keys[order.index].isExist=false;
+        }else{
+            order.token=order.token.sub(amount);
+        }
+        address payable addr = getPayable(msg.sender);
+        addr.transfer(amount);
+    }
+ 
+    function takeAllToken() public {
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        PledgeOrder storage order=_orders[msg.sender];
+        require(order.token>0,"no order");
+        keys[order.index].isExist=false;
+        uint256 takeAmount=order.token;
+        order.token=0;
+        _totalPledegAmount=_totalPledegAmount.sub(takeAmount);
+        uint256 time=block.timestamp;
+        uint256 diff=time.sub(_takeProfitTime[msg.sender]);
+        if(diff>=86400){
+            uint256 profitPart=order.profitToken.mul(_precentUp).div(_precentDown);
+            keys[order.index].isExist = false;
+            order.profitToken=order.profitToken.sub(profitPart);
+            _takeProfitTime[msg.sender]=time;
+            _Token.safeTransfer(address(msg.sender),profitPart);
+        }
+        address payable addr = getPayable(msg.sender);
+        addr.transfer(takeAmount);
+    }
+ 
+    function getPledgeToken(address tokenAddress) public view returns(uint256) {
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        PledgeOrder memory order=_orders[tokenAddress];
+        return order.token;
+    }
+ 
+    function getProfitToken(address tokenAddress) public view returns(uint256) {
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        PledgeOrder memory order=_orders[tokenAddress];
+        return order.profitToken;
+    }
+ 
+    function getTotalPledge() public view returns(uint256) {
+        require(address(msg.sender) == address(tx.origin), "no contract");
+        return _totalPledegAmount;
+    }
+ 
+    function getPayable(address tokenAddress) private pure returns (address payable) {
+        return address(uint168(tokenAddress));
+    }
+ 
+    function getTakeProfitTime(address tokenAddress) public view returns(uint256) {
+        return _takeProfitTime[tokenAddress];
+    }
+ 
+    function changeIsDIS(bool flag) public onlyOwner {
+        _isDIS= flag;
+    }
+ 
+    function changeOwner(address paramOwner) public onlyOwner {
+        require(paramOwner != address(0));
+		owner= paramOwner;
+    }
+ 
+    function changeProfitor(address paramProfitor) public onlyOwner {
+        profitor= paramProfitor;
+    }
+ 
+    modifier onlyOwner(){
+        require(msg.sender == owner);
+        _;
+    }
+ 
+    modifier onlyProfitor(){
+        require(msg.sender == profitor);
+    _;
+    }
+ 
+    function getOwner() public view returns (address) {
+        return owner;
+    }
+ 
+    function getProfitor() public view returns (address) {
+        return profitor;
+    }
+ 
+    function getsize() public view returns (uint256) {
+        return size;
+    }
+ 
+    function maxPledgeAmount() public view returns (uint256) {
+        return _maxPledgeAmount;
+    }
+ 
+    function maxMiningAmount() public view returns (uint256) {
+        return _maxMiningAmount;
+    }
+ 
+    function leftMiningAmount() public view returns (uint256) {
+        return _leftMiningAmount;
+    }
+ 
+    function minAmount() public view returns (uint256) {
+        return _minAmount;
+    }
+ 
+    function maxPreMiningAmount() public view returns (uint256) {
+        return _maxPreMiningAmount;
+    }
+ 
+    function startTime() public view returns (uint256) {
+        return _startTime;
+    }
+ 
+    function endTime() public view returns (uint256) {
+        return _endTime;
+    }
+ 
+    function nowTime() public view returns (uint256) {
+        return block.timestamp;
+    }
+ 
+    function isDIS() public view returns (bool) {
+        return _isDIS;
+    }
+ 
+}
